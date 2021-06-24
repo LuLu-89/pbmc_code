@@ -1,0 +1,18 @@
+SELECT dbo_tblTeddyClinTrack.idDCC AS ID, 
+       dbo_tblTeddyClinTrack.SCHEDATE AS [Scheduled Date], 
+       dbo_tblScreenedElig.firstname AS [First Name], 
+       dbo_tblScreenedElig.lastname AS [Last Name], 
+       dbo_tblScreenedElig.idFamHxT1DM AS [Family history], 
+       dbo_tblHlaResults.HLACode AS [HLA Code], 
+       dbo_tblScreenedElig.PosClass AS [Positive Class], 
+       
+       IIf([dbo_tblScreenedElig].[idFamHxT1DM]=388,'PBMC 1',
+       IIf([dbo_tblHLAResults].[HLACode]='A','PBMC 2',
+       IIf([dbo_tblScreenedElig].[PosClass] In ('A','A-','C','C-','T+'),'PBMC 3','PBMC 4'))) AS PBMC
+
+      FROM dbo_tblTeddyClinTrack INNER JOIN (dbo_tblScreenedElig 
+      LEFT JOIN dbo_tblHlaResults ON dbo_tblScreenedElig.LocalCode = dbo_tblHlaResults.LocalCode) 
+                ON dbo_tblTeddyClinTrack.idDCC = dbo_tblScreenedElig.idDCC
+                WHERE (((dbo_tblTeddyClinTrack.SCHEDATE) 
+                Between [Start Date] And DateAdd("d",7,[Start Date])))
+     ORDER BY dbo_tblTeddyClinTrack.SCHEDATE;
